@@ -2081,10 +2081,12 @@ Chúc mừng ngày 20/11! Gửi lời chúc tới em nhiều hơn tất cả nh�
       youtubeMusicPlayer.unMute();
       youtubeMusicPlayer.setVolume(70);
       youtubeMusicPlayer.playVideo();
+      document.removeEventListener('pointerdown', startYouTubeMusicFromGesture);
+      document.removeEventListener('keydown', startYouTubeMusicFromGesture);
     }
 
-    document.addEventListener('pointerdown', startYouTubeMusicFromGesture, { once: true });
-    document.addEventListener('keydown', startYouTubeMusicFromGesture, { once: true });
+    document.addEventListener('pointerdown', startYouTubeMusicFromGesture);
+    document.addEventListener('keydown', startYouTubeMusicFromGesture);
 
     const youtubeApiScript = document.createElement('script');
     youtubeApiScript.src = 'https://www.youtube.com/iframe_api';
