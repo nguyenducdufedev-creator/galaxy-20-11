@@ -154,6 +154,9 @@
 
   <!-- Khung chứa WebGL 3D Canvas -->
   <div id="canvas-container"></div>
+  <div id="youtube-player-container" aria-hidden="true" style="position:fixed;left:-220px;top:0;width:200px;height:200px;opacity:0;pointer-events:none;z-index:-1">
+    <div id="youtube-player"></div>
+  </div>
 
   <!-- HUD Góc trên: Tiêu đề, Phụ đề 20/11 & Nút Mở Thư -->
   <header class="fixed top-4 left-4 right-4 z-20 pointer-events-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
@@ -2040,6 +2043,53 @@ Chúc mừng ngày 20/11! Gửi lời chúc tới em nhiều hơn tất cả nh�
         }
       }
     }
+
+    const YOUTUBE_VIDEO_ID = '72qtZ2ezb44';
+    let youtubeMusicPlayer = null;
+
+    window.onYouTubeIframeAPIReady = () => {
+      youtubeMusicPlayer = new YT.Player('youtube-player', {
+        width: '200',
+        height: '200',
+        videoId: YOUTUBE_VIDEO_ID,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          loop: 1,
+          playlist: YOUTUBE_VIDEO_ID,
+          playsinline: 1,
+          rel: 0,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: (event) => {
+            event.target.setVolume(70);
+            event.target.playVideo();
+          },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.ENDED) event.target.playVideo();
+          },
+          onError: (event) => console.error('Lỗi phát nhạc YouTube:', event.data)
+        }
+      });
+    };
+
+    function startYouTubeMusicFromGesture() {
+      if (!youtubeMusicPlayer) return;
+      youtubeMusicPlayer.unMute();
+      youtubeMusicPlayer.setVolume(70);
+      youtubeMusicPlayer.playVideo();
+    }
+
+    document.addEventListener('pointerdown', startYouTubeMusicFromGesture, { once: true });
+    document.addEventListener('keydown', startYouTubeMusicFromGesture, { once: true });
+
+    const youtubeApiScript = document.createElement('script');
+    youtubeApiScript.src = 'https://www.youtube.com/iframe_api';
+    youtubeApiScript.async = true;
+    document.head.appendChild(youtubeApiScript);
 
     window.onload = bootstrapApp;
   </script>
