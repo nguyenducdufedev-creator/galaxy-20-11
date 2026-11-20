@@ -154,7 +154,7 @@
 
   <!-- Khung chứa WebGL 3D Canvas -->
   <div id="canvas-container"></div>
-  <div id="youtube-player-container" aria-hidden="true" style="position:fixed;left:-220px;top:0;width:200px;height:200px;opacity:0;pointer-events:none;z-index:-1">
+  <div id="youtube-player-container" aria-hidden="true" style="position:fixed;left:0;top:0;width:200px;height:200px;opacity:0.01;pointer-events:none;z-index:1">
     <div id="youtube-player"></div>
   </div>
 
@@ -2046,6 +2046,7 @@ Chúc mừng ngày 20/11! Gửi lời chúc tới em nhiều hơn tất cả nh�
 
     const YOUTUBE_VIDEO_ID = '72qtZ2ezb44';
     let youtubeMusicPlayer = null;
+    let youtubeMusicWasPlaying = false;
 
     window.onYouTubeIframeAPIReady = () => {
       youtubeMusicPlayer = new YT.Player('youtube-player', {
@@ -2065,10 +2066,15 @@ Chúc mừng ngày 20/11! Gửi lời chúc tới em nhiều hơn tất cả nh�
         },
         events: {
           onReady: (event) => {
+            const iframe = event.target.getIframe();
+            iframe.setAttribute('playsinline', '');
+            iframe.setAttribute('webkit-playsinline', '');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
             event.target.setVolume(70);
             event.target.playVideo();
           },
           onStateChange: (event) => {
+            if (event.data === YT.PlayerState.PLAYING) youtubeMusicWasPlaying = true;
             if (event.data === YT.PlayerState.ENDED) event.target.playVideo();
           },
           onError: (event) => console.error('Lỗi phát nhạc YouTube:', event.data)
@@ -2087,6 +2093,12 @@ Chúc mừng ngày 20/11! Gửi lời chúc tới em nhiều hơn tất cả nh�
 
     document.addEventListener('pointerdown', startYouTubeMusicFromGesture);
     document.addEventListener('keydown', startYouTubeMusicFromGesture);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && youtubeMusicWasPlaying && youtubeMusicPlayer &&
+          youtubeMusicPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
+        youtubeMusicPlayer.playVideo();
+      }
+    });
 
     const youtubeApiScript = document.createElement('script');
     youtubeApiScript.src = 'https://www.youtube.com/iframe_api';
